@@ -19,25 +19,32 @@ app.get("/", function (req, res, next) {
   res.status(200).send("Hello World");
 });
 
-app.post("/upload", function (req, res, next) {
+app.post("/upload", async (req, res, next) => {
   const file = req.files.photo;
-  cloudinary.uploader.upload(file.tempFilePath,function(err,result){
+  var arr = [];
+  for (let index = 0; index < file.length; index++) {
+    await cloudinary.uploader.upload(file[index].tempFilePath,function(err,result){
+      if (result) { arr.push(result.url);}
+    });
+  }
+
+  res.send({
+    success:true,
+    url: arr
+  });
+
+  
+});
+/* app.post("/upload", function (req, res, next) {
+  const file = req.files.photo;
+  cloudinary.uploader.upload(file.tempFilePath, function (err, result) {
     res.send({
-      success:true,
+      success: true,
       result
     })
   });
-  //console.log(file);
- /*  file.mv("./uploads" + file.name, function (err, result) {
-    if (err) {
-      throw err;
-      res.send({
-        success: true,
-        message: "File uploaded !",
-      });
-    }
-  }); */
-});
-app.listen(3000, () => {
-  console.log("started on port : 3000");
-});
+}); */
+
+  app.listen(3000, () => {
+    console.log("started on port : 3000");
+  });
